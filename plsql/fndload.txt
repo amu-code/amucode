@@ -1,0 +1,80 @@
+﻿--获取语言环境
+SELECT '"' || nls_language || '_' || nls_territory || '.' || VALUE || '"' nls_lang
+FROM fnd_languages, v$nls_parameters
+WHERE language_code IN ('US', 'ZHS')
+AND parameter = 'NLS_CHARACTERSET';
+--中文
+NLS_LANG="AMERICAN_AMERICA.AL32UTF8"
+
+--英文
+NLS_LANG="SIMPLIFIED CHINESE_CHINA.AL32UTF8"
+--设置临时环境变量
+export NLS_LANG
+
+--迁移请求
+FNDLOAD apps/appsjiahui O Y DOWNLOAD $FND_TOP/patch/115/import/afcpprog.lct CUXPOTOLS.ldt PROGRAM APPLICATION_SHORT_NAME="CUX" CONCURRENT_PROGRAM_NAME="CUXPOTOLS"
+
+FNDLOAD apps/appsjiahui O Y UPLOAD $FND_TOP/patch/115/import/afcpprog.lct CUXPOTOLS.ldt
+
+
+--迁移个性化
+FNDLOAD apps/appsjiahui 0 Y DOWNLOAD $FND_TOP/patch/115/import/affrmcus.lct RCV_RCVRCERC.ldt FND_FORM_CUSTOM_RULES function_name="RCV_RCVRCERC"
+
+FNDLOAD apps/appsjiahui 0 Y UPLOAD $FND_TOP/patch/115/import/affrmcus.lct RCV_RCVRCERC.ldt
+
+--迁移值集
+FNDLOAD apps/appsjiahui 0 Y DOWNLOAD $FND_TOP/patch/115/import/afffload.lct CUX_PO_ORG_NAME.ldt VALUE_SET FLEX_VALUE_SET_NAME="CUX_PO_ORG_NAME"
+
+FNDLOAD apps/appsjiahui 0 Y UPLOAD $FND_TOP/patch/115/import/afffload.lct CUX_PO_ORG_NAME.ldt
+
+--迁移WEADI
+FNDLOAD apps/appsjiahui 0 Y DOWNLOAD $BNE_TOP/patch/115/import/bneintegrator.lct CUX_WEB_GLSEQASG_XINTG.ldt BNE_INTEGRATORS INTEGRATOR_ASN="CUX" INTEGRATOR_CODE="CUX_WEB_GLSEQASG_XINTG"
+
+FNDLOAD apps/appsjiahui 0 Y UPLOAD $BNE_TOP/patch/115/import/bneintegrator.lct CUX_WEB_GLSEQIMP_XINTG.ldt
+
+--迁移菜单
+FNDLOAD apps/appsjiahui O Y DOWNLOAD $FND_TOP/patch/115/import/afsload.lct CUX_SUPER_MENU.ldt MENU MENU_NAME="CUX_SUPER_MENU"
+
+FNDLOAD apps/appsjiahui O Y UPLOAD $FND_TOP/patch/115/import/afsload.lct CUX_SUPER_MENU.ldt
+
+--迁移职责
+FNDLOAD apps/appsjiahui O Y DOWNLOAD $FND_TOP/patch/115/import/afscursp.lct CUX_SUPERUSER.ldt FND_RESPONSIBILITY RESP_KEY="CUX_SUPERUSER"
+
+FNDLOAD apps/appsjiahui O Y UPLOAD $FND_TOP/patch/115/import/afscursp.lct CUX_SUPERUSER.ldt
+
+--迁移请求组 
+
+FNDLOAD apps/appsjiahui 0 Y DOWNLOAD $FND_TOP/patch/115/import/afcpreqg.lct "CUX_Superuser".ldt REQUEST_GROUP APPLICATION_SHORT_NAME="CUX" REQUEST_GROUP_NAME="CUX_Superuser"
+
+FNDLOAD apps/appsjiahui 0 Y UPLOAD $FND_TOP/patch/115/import/afcprset.lct CUX_Superuser.ldt
+
+FNDLOAD apps/appsjiahui 0 Y UPLOAD $FND_TOP/patch/115/import/afcpreqg.lct /u03/ebsuat1/app/fs1/EBSapps/appl/cux/12.0.0/tmp/RESP_GROUP/code/fndload/ZHS/CUX_Superuser_ZHS.ldt UPLOAD_MODE='NLS'
+
+
+-------------------------
+常用LCT 文件
+----------
+FND	afcpprog.lct	可执行、并发程序、值集、弹性域
+FND	afcpexec.lct	可执行程序
+FND	afattach.lct	附件
+FND	afcpreqg.lct	请求组
+FND	afcprset.lct	请求集
+FND	afffload.lct	值集、关键性弹性域和描述性弹性域及相关安全性设置
+FND	aflvmlu.lct	Lookups
+FND	afmdmsg.lct	消息
+FND	afscprof.lct	profile options 预制文件
+FND	afscursp.lct	Application users,User Responsibilities,Security groups,Applications,Application Responsibilities and Exclusion Functions
+FND	afsload.lct	FORM, FUNCTION, MENU, ENTRY, OBJECT, OBJECT_INSTANCE_SET, GRANT
+FND	affrmcus.lct	Form个性化定义
+----
+end
+
+-------
+---yili---
+
+并发程序：
+请求迁移
+
+ FNDLOAD apps/apps O Y DOWNLOAD $FND_TOP/patch/115/import/afcpprog.lct XXX.ldt PROGRAM APPLICATION_SHORT_NAME=CUX  CONCURRENT_PROGRAM_NAME=XXX NLS_LANG= "AMERICAN_AMERICA.AL32UTF8"
+
+---end---
